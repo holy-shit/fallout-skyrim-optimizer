@@ -735,9 +735,11 @@ int WinMainCRTStartup()
 			if (dialog) PostMessage(dialog,WM_USER,0,0);
 			LogMessageBox(TEXT("Original exe modified -> Executable headers failed to validate.\n")
 				TEXT("\n")
-				TEXT("An unmodified original exe is required. You should get Steam to validate your game cache and download unmodified versions of any files."), TEXT("Error"), MB_ICONERROR);
+				TEXT("An unmodified original exe is recommended. You should get Steam to validate your game cache and download unmodified versions of any files."), 
+				TEXT("Important Information"), MB_ICONINFORMATION);
 		}
-		return -1;
+		//Uncomment this to raise unrecoverable error
+		//return -1;
 	}
 	else {
 		Console->WriteLine("    Loader: Validation passed");
