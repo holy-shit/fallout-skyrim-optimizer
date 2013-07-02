@@ -48,10 +48,11 @@ because it is prohibited by law of most countries including Russia :-)
 Command Line Reference
 ======================
 
+```
 FNV4GB.exe    [-exe string] [-laaexe string] [-SteamAppID number] [-nolaa]
               [-noskse] [-extradll string [-extradll string [...]]]
 			  [-- game parameters]
-
+```
 
 Details
 
@@ -95,3 +96,30 @@ FNV4GB.exe -laaexe .\FalloutNV.exe
     Create a LAA Exe called FalloutNV.exe in the directory containing FNV4GB. 
 	This is probably what you'd want to do if you need some other application
 	to detect FalloutNV.exe loading, not FalloutNV.exe.4gb
+
+
+Technical Details
+========================
+
+FNV4GB performs the following actions
+
+1) Gets the Install Path for the game from the registry value:
+   HKEY_LOCAL_MACHINE\SOFTWARE\Bethesda Softworks\FalloutNV\Installed Path
+2) Changes to the games Directory
+3) Copies FalloutNV.exe to FalloutNV.4GB if needed
+4) Sets the LARGEADDRESSAWARE bit on FalloutNV.4GB if needed
+5) Sets the environment variable SteamAPPId to 22380 (or whatever value was 
+   specified on the command line) which tells Steam to run the game (not 
+   restart and load the launcher)
+6) Creates a new process for FalloutNV.4GB with the main thread suspended
+7) Injects fnv4gb_helper.dll into the FalloutNV.4GB process
+8) fnv4gb_helper unsets the LARGEADDRESSAWARE bit in the loaded headers so 
+   when steam verifies the loaded executable in memory it passes
+9) fnv4gb_helper hooks the GetTickCount function to attempt to reduce 
+   stuttering
+10) fnv4gb_helper hooks the CreateFileA function so when steam attempts to 
+   verify the disk executable file against the loaded memory it loads the 
+   untouched FalloutNV.exe instead of the modified FalloutNV.4gb
+11) The FNV4GB loader verifies that Large Addresses are enabeles in the 
+    FalloutNV.4gb
+12) FNV4GB loader unsuspends the main thread so the game can run
